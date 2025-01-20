@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Center Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('sm3_xrnm2o3.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        /* Overlay to make text readable */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Black overlay with 50% opacity */
+            z-index: 1;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 2; /* Place above the overlay */
+            background-color: rgba(255, 215, 0, 0.95); /* Semi-transparent gold */
+            border: 2px solid black;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+
+        .login-container h1 {
+            margin-bottom: 20px;
+            color: black;
+            font-size: 26px;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"],
+        .login-container select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid black;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .login-container input:hover,
+        .login-container select:hover {
+            border-color: #ffd700;
+        }
+
+        .login-container input:focus, 
+        .login-container select:focus {
+            outline: 2px solid #ffd700;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: black;
+            color: #ffd700;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        .login-container button:hover {
+            background-color: #333;
+        }
+
+        .login-container .extras {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .login-container .extras a {
+            color: blue;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-container .extras a:hover {
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .password-toggle input {
+            margin-right: 10px;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Contact Center Login</h1>
+        <form id="login-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="e.g., johndoe" required aria-label="Enter your username">
+            <div class="error" id="username-error"></div>
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required aria-label="Enter your password">
+            <div class="password-toggle">
+                <input type="checkbox" id="show-password" aria-label="Toggle password visibility">
+                <label for="show-password">Show Password</label>
+            </div>
+            <div class="error" id="password-error"></div>
+
+            <label for="user-type">Select Role</label>
+            <select id="user-type" required aria-label="Select your role">
+                <option value="" disabled selected>Choose a role</option>
+                <option value="agent">🛠 Agent</option>
+                <option value="management">📊 Management</option>
+            </select>
+            <div class="error" id="user-type-error"></div>
+
+            <div class="extras">
+                <label>
+                    <input type="checkbox" id="remember-me" aria-label="Remember me">
+                    Remember Me
+                </label>
+                <a href="forgot-password.html">Forgot Password?</a>
+            </div>
+
+            <button type="submit">Log In</button>
+        </form>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        }
+
+        function showError(fieldId, message) {
+            document.getElementById(`${fieldId}-error`).textContent = message;
+        }
+
+        // Handle login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('user-type').value;
+
+            if (!username || !password || !userType) {
+                showError('username-error', 'Username is required.');
+                showError('password-error', 'Password is required.');
+                showError('user-type-error', 'Please select a role.');
+                return;
+            } else {
+                showError('username-error', '');
+                showError('password-error', '');
+                showError('user-type-error', '');
+
+                // Example of basic password complexity check
+                if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)) {
+                    showError('password-error', 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.');
+                    return;
+                }
+
+                // Simulating successful login
+                alert('Login successful! Redirecting to the platform...');
+                window.location.href = 'home.html';
+            }
+        });
+
+        // Attach togglePassword to checkbox click event
+        document.getElementById('show-password').addEventListener('change', togglePassword);
+    </script>
+</body>
+</html>

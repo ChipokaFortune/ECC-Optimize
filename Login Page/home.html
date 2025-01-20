@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Centre Optimize</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: #ffd700;
+            color: black;
+            padding: 15px 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #ffd700;
+            border: 1px solid #000;
+            text-align: center;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .tab:hover, .tab.active {
+            background-color: black;
+            color: #ffd700;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ccc;
+            margin: 20px;
+            border-radius: 5px;
+            flex: 1;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #000;
+            color: #ffd700;
+        }
+        button {
+            background-color: #ffd700;
+            color: #333;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+        }
+        .tab-content.active .loading {
+            display: block;
+        }
+        @media (max-width: 600px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Contact Centre Optimize</h1>
+        <button id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </header>
+    <div class="hero">
+        <h1>Welcome to the Contact Center Management Platform</h1>
+        <p>Streamline operations, plan shifts efficiently, and manage teams effortlessly.</p>
+    </div>
+    <nav class="tabs">
+        <button class="tab active" data-tab="scheduling" aria-controls="scheduling" aria-selected="true"><i class="fas fa-calendar-alt"></i> Scheduling</button>
+        <button class="tab" data-tab="leave-planner" aria-controls="leave-planner"><i class="fas fa-plane"></i> Leave Planner</button>
+        <button class="tab" data-tab="shift-summary" aria-controls="shift-summary"><i class="fas fa-clock"></i> Shift Summary</button>
+        <button class="tab" data-tab="agent-availability" aria-controls="agent-availability"><i class="fas fa-user-check"></i> Agent Availability</button>
+    </nav>
+    <main>
+        <div class="tab-content active" id="scheduling">
+            <h2>Scheduling</h2>
+            <div class="loading">Loading...</div>
+            <table style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Agent Name</th>
+                        <th>Shift</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody id="schedulingTableBody"></tbody>
+            </table>
+        </div>
+        <div class="tab-content" id="leave-planner">
+            <h2>Leave Planner</h2>
+            <div class="loading">Loading...</div>
+            <!-- Content will be dynamically loaded here -->
+        </div>
+        <div class="tab-content" id="shift-summary">
+            <h2>Shift Summary</h2>
+            <div class="loading">Loading...</div>
+            <!-- Content will be dynamically loaded here -->
+        </div>
+        <div class="tab-content" id="agent-availability">
+            <h2>Agent Availability</h2>
+            <div class="loading">Loading...</div>
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    const tabContent = document.getElementById(tab.getAttribute('data-tab'));
+                    tabContent.classList.add('active');
+                    
+                    // Show loading indicator
+                    tabContent.querySelector('.loading').style.display = 'block';
+                    // Hide table or content while loading
+                    const table = tabContent.querySelector('table');
+                    if (table) table.style.display = 'none';
+
+                    loadTabContent(tab.getAttribute('data-tab'));
+                });
+            });
+
+            // Logout functionality
+            document.getElementById('logoutButton').addEventListener('click', function() {
+                window.location.href = '/logout';
+            });
+
+            // Function to load content dynamically for tabs
+            function loadTabContent(tabId) {
+                fetch(`/api/${tabId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (tabId === 'scheduling') {
+                            const tableBody = document.getElementById('schedulingTableBody');
+                            tableBody.innerHTML = ''; // Clear previous content
+                            data.forEach(item => {
+                                const row = document.createElement('tr');
+                                ['agent_name', 'shift', 'start_time', 'end_time', 'availability'].forEach(key => {
+                                    const cell = document.createElement('td');
+                                    cell.textContent = item[key] || 'N/A';
+                                    row.appendChild(cell);
+                                });
+                                tableBody.appendChild(row);
+                            });
+                            document.querySelector('#scheduling table').style.display = 'table';
+                        } else {
+                            // Placeholder for other tabs
+                            document.getElementById(tabId).innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                        }
+                        document.getElementById(tabId).querySelector('.loading').style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error loading data:', error);
+                        document.getElementById(tabId).innerHTML += `<p>Error: ${error.message}</p>`;
+                        document.getElementById(tabId).querySelector('.loading').style.display = 'none';
+                    });
+            }
+
+            // Initial load for the active tab
+            loadTabContent('scheduling');
+        });
+    </script>
+</body>
+</html>
